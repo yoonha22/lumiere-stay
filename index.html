@@ -110,7 +110,7 @@
 // ===== CONFIG =====
 // ⚠️ 여기에 Gemini API 키를 입력하세요
 // https://aistudio.google.com 에서 무료로 발급받을 수 있어요
-const API_KEY = "AIzaSyAjXIe-vGytPeD1HkILxLPggDoaKQ2-zKs";
+const API_KEY = "여기에_GEMINI_API_키_입력";
 
 // ===== DATA =====
 const REGIONS = ["서울","부산","제주","강릉/속초","경주","전주","여수","수도권 근교","도쿄","오사카","방콕","발리","파리","뉴욕","런던","싱가포르","홍콩","바르셀로나"];
@@ -150,13 +150,13 @@ let state = {
 async function callClaude(prompt, loadingMsg) {
   showLoading(loadingMsg);
   const res = await fetch(
-    `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${API_KEY}`,
+    `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash-latest:generateContent?key=${API_KEY}`,
     {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
         contents: [{ role: "user", parts: [{ text: prompt }] }],
-        generationConfig: { temperature: 0.7, maxOutputTokens: 2500 }
+        generationConfig: { temperature: 0.7, maxOutputTokens: 2500, responseMimeType: "application/json" }
       })
     }
   );
