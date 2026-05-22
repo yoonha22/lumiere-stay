@@ -1,0 +1,628 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Lumière Stay</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;1,300;1,400&family=Inter:wght@300;400;500&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    body { background: #FAF7F2; font-family: 'Inter', sans-serif; color: #2C2416; }
+    button { cursor: pointer; font-family: inherit; }
+    textarea { font-family: inherit; }
+
+    @keyframes fadeUp { from { opacity:0; transform:translateY(12px); } to { opacity:1; transform:translateY(0); } }
+    @keyframes bounce { 0%,80%,100% { transform:scale(0.8); opacity:0.3; } 40% { transform:scale(1.2); opacity:1; } }
+    @keyframes spin { from { transform:rotate(0deg); } to { transform:rotate(360deg); } }
+    @keyframes imgFade { from { opacity:0; } to { opacity:1; } }
+
+    .fade-up { animation: fadeUp .45s ease both; }
+    .fade-up:nth-child(2) { animation-delay:.08s; }
+    .fade-up:nth-child(3) { animation-delay:.16s; }
+    .fade-up:nth-child(4) { animation-delay:.24s; }
+
+    .chip { padding:6px 15px; border-radius:100px; font-size:12px; border:1px solid #DDD5C8; background:#fff; color:#8A7560; transition:all .18s; }
+    .chip:hover, .chip.active { border-color:#A68558; color:#6B5233; background:rgba(139,111,71,0.08); }
+    .chip.active { background:rgba(139,111,71,0.12); }
+
+    .rel-btn { padding:9px 18px; border-radius:100px; font-size:13px; border:1px solid #DDD5C8; background:#fff; color:#8A7560; transition:all .18s; display:flex; align-items:center; gap:7px; }
+    .rel-btn:hover, .rel-btn.active { border-color:#A68558; background:rgba(139,111,71,0.08); color:#6B5233; }
+
+    .brow { padding:12px 16px; border-radius:10px; border:1px solid #DDD5C8; background:#F3EDE3; text-align:left; display:flex; align-items:center; gap:14px; transition:all .18s; width:100%; }
+    .brow:hover, .brow.active { border-color:#A68558; background:rgba(139,111,71,0.06); }
+
+    .hsel { background:#fff; border-radius:16px; overflow:hidden; cursor:pointer; border:1.5px solid #DDD5C8; box-shadow:0 2px 12px rgba(0,0,0,0.05); transition:all .2s; display:flex; flex-direction:column; }
+    .hsel:hover { border-color:#A68558; box-shadow:0 4px 20px rgba(139,111,71,0.15); }
+    .hsel.selected { border-color:#8B6F47; box-shadow:0 6px 28px rgba(139,111,71,0.2); }
+
+    .pbtn { width:100%; padding:14px; border-radius:12px; border:none; background:#8B6F47; color:#fff; font-size:15px; font-weight:500; letter-spacing:0.06em; transition:background .18s; }
+    .pbtn:hover:not(:disabled) { background:#6B5233; }
+    .pbtn:disabled { opacity:.4; cursor:not-allowed; }
+
+    .gbtn { flex:1; padding:14px; border-radius:12px; border:1px solid #DDD5C8; background:transparent; color:#B8A898; font-size:13px; transition:all .18s; }
+    .gbtn:hover { border-color:#B8A898; color:#8A7560; }
+
+    .stepper-btn { width:32px; height:32px; border-radius:50%; border:1px solid #DDD5C8; background:#fff; font-size:18px; color:#8A7560; display:flex; align-items:center; justify-content:center; transition:all .18s; }
+    .stepper-btn:hover { border-color:#8B6F47; color:#8B6F47; }
+
+    .card { background:#fff; border:1px solid #DDD5C8; border-radius:16px; padding:1.5rem; box-shadow:0 2px 12px rgba(0,0,0,0.04); margin-bottom:14px; }
+
+    .detail-btn { width:100%; padding:10px 1.4rem; background:#F3EDE3; border:none; border-top:1px solid #DDD5C8; font-size:11px; color:#B8A898; text-align:left; display:flex; justify-content:space-between; align-items:center; letter-spacing:0.1em; text-transform:uppercase; transition:color .18s; }
+    .detail-btn:hover { color:#8B6F47; }
+
+    .serif { font-family: 'Cormorant Garamond', Georgia, serif; }
+    .hidden { display:none; }
+
+    @media (max-width: 480px) {
+      .hotel-grid { grid-template-columns: 1fr !important; }
+      h1.serif { font-size: 30px !important; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- ========== HEADER ========== -->
+<div style="background:#fff;border-bottom:1px solid #DDD5C8;text-align:center;padding:2.5rem 1rem 2rem;">
+  <p style="font-size:10px;color:#A68558;letter-spacing:0.3em;text-transform:uppercase;margin-bottom:10px;">AI Concierge · Hôtel & Voyage</p>
+  <h1 class="serif" style="font-size:38px;font-weight:300;letter-spacing:0.06em;color:#2C2416;margin-bottom:6px;">Lumière Stay</h1>
+  <p class="serif" style="font-size:14px;font-style:italic;color:#B8A898;margin-bottom:16px;">Votre séjour parfait, curé par l'IA</p>
+  <div style="display:flex;justify-content:center;gap:6px;align-items:center;">
+    <div style="width:24px;height:1px;background:#DDD5C8;"></div>
+    <span style="font-size:12px;color:#A68558;">✦</span>
+    <div style="width:24px;height:1px;background:#DDD5C8;"></div>
+  </div>
+</div>
+
+<div style="max-width:580px;margin:0 auto;padding:2rem 1rem 3rem;" id="app">
+
+  <!-- STEP INDICATOR -->
+  <div id="step-indicator" style="display:flex;align-items:center;justify-content:center;margin-bottom:2rem;"></div>
+
+  <!-- ERROR -->
+  <p id="error-msg" class="hidden" style="color:#c0392b;text-align:center;font-size:13px;margin-bottom:1rem;"></p>
+
+  <!-- LOADING -->
+  <div id="loading" class="hidden" style="text-align:center;padding:4rem 0;">
+    <div class="serif" style="font-size:36px;color:#A68558;margin-bottom:16px;display:inline-block;animation:spin 8s linear infinite;">✦</div>
+    <p id="loading-msg" class="serif" style="font-size:18px;font-style:italic;color:#8A7560;margin-bottom:6px;">최적의 호텔을 찾고 있습니다…</p>
+    <p style="font-size:12px;color:#B8A898;margin-bottom:28px;letter-spacing:0.08em;">잠시만 기다려 주세요</p>
+    <div style="display:flex;justify-content:center;gap:8px;">
+      <div style="width:6px;height:6px;border-radius:50%;background:#A68558;animation:bounce 1.2s ease-in-out 0s infinite;"></div>
+      <div style="width:6px;height:6px;border-radius:50%;background:#A68558;animation:bounce 1.2s ease-in-out 0.2s infinite;"></div>
+      <div style="width:6px;height:6px;border-radius:50%;background:#A68558;animation:bounce 1.2s ease-in-out 0.4s infinite;"></div>
+    </div>
+  </div>
+
+  <!-- STEPS -->
+  <div id="step1"></div>
+  <div id="step2" class="hidden"></div>
+  <div id="step3" class="hidden"></div>
+  <div id="step4" class="hidden"></div>
+</div>
+
+<!-- FOOTER -->
+<div style="text-align:center;padding:1.5rem;border-top:1px solid #DDD5C8;background:#fff;">
+  <p class="serif" style="margin:0;font-size:12px;font-style:italic;color:#B8A898;">Lumière Stay · Powered by Claude AI</p>
+</div>
+
+<script>
+// ===== CONFIG =====
+// ⚠️ 여기에 Anthropic API 키를 입력하세요
+// https://console.anthropic.com 에서 발급받을 수 있어요
+const API_KEY = "여기에_API_키_입력";
+
+// ===== DATA =====
+const REGIONS = ["서울","부산","제주","강릉/속초","경주","전주","여수","수도권 근교","도쿄","오사카","방콕","발리","파리","뉴욕","런던","싱가포르","홍콩","바르셀로나"];
+const PURPOSES = ["휴양/힐링","가족여행","커플/로맨틱","비즈니스","문화탐방","액티비티/모험","허니문","친구 여행"];
+const BUDGETS = [
+  { label:"Économique", sub:"1인 5만원 이하/박",  icon:"🌿" },
+  { label:"Confort",    sub:"1인 5~10만원/박",   icon:"🏡" },
+  { label:"Supérieur",  sub:"1인 10~20만원/박",  icon:"🏨" },
+  { label:"Déluxe",     sub:"1인 20~40만원/박",  icon:"✦"  },
+  { label:"Prestige",   sub:"1인 40만원 이상/박", icon:"👑" },
+];
+const AGE_GROUPS = ["유아(0-5세)","어린이(6-12세)","청소년(13-18세)","20대","30대","40대","50대","60대 이상"];
+const RELATIONS = [
+  {label:"혼자",icon:"🧳"},{label:"커플",icon:"💑"},
+  {label:"가족",icon:"👨‍👩‍👧"},{label:"친구들",icon:"👫"},{label:"비즈니스",icon:"💼"},
+];
+const IMG_KEYWORDS = {
+  "파리":"paris hotel elegant","런던":"london boutique hotel","바르셀로나":"barcelona hotel architecture",
+  "뉴욕":"new york luxury hotel","발리":"bali resort pool villa","방콕":"bangkok luxury hotel",
+  "도쿄":"tokyo hotel modern","오사카":"osaka hotel japan","싱가포르":"singapore hotel rooftop",
+  "홍콩":"hong kong hotel view","제주":"jeju korea resort","부산":"busan korea hotel ocean",
+  "서울":"seoul hotel modern","강릉/속초":"korea east sea resort","경주":"korea traditional hotel",
+  "전주":"korea hanok hotel","여수":"korea yeosu ocean","수도권 근교":"korea resort nature",
+};
+
+// ===== STATE =====
+let state = {
+  step: 1,
+  adults: 2, children: 0, ageGroups: [], relation: "",
+  region: "", nights: 2, budget: "", budgetLabel: "",
+  purposes: [], extra: "",
+  results: null, summary: "",
+  selectedHotel: null, attractions: null, attrSummary: "",
+};
+
+// ===== API =====
+async function callClaude(prompt, loadingMsg) {
+  showLoading(loadingMsg);
+  const res = await fetch("https://api.anthropic.com/v1/messages", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      "x-api-key": API_KEY,
+      "anthropic-version": "2023-06-01",
+      "anthropic-dangerous-direct-browser-access": "true"
+    },
+    body: JSON.stringify({
+      model: "claude-sonnet-4-20250514",
+      max_tokens: 2500,
+      messages: [{ role: "user", content: prompt }]
+    })
+  });
+  const data = await res.json();
+  const text = data.content?.map(b => b.text || "").join("") || "";
+  return JSON.parse(text.replace(/```json|```/g, "").trim());
+}
+
+function hotelPrompt() {
+  return `당신은 전문 호텔 추천 AI입니다. 아래 조건에 맞는 호텔 4개를 추천해주세요.
+인원: 성인 ${state.adults}명, 어린이 ${state.children}명 / 연령대: ${state.ageGroups.join(",")} / 관계: ${state.relation}
+여행지: ${state.region} / ${state.nights}박 / 예산: ${state.budget} / 목적: ${state.purposes.join(",")}
+${state.extra ? `추가: ${state.extra}` : ""}
+JSON만 출력:
+{"summary":"감성적인 한줄 추천 코멘트(50자)","hotels":[{"name":"호텔명","location":"위치","rating":4.5,"price":"₩150,000~200,000","tags":["태그1","태그2","태그3"],"reason":"추천이유 2-3문장","details":"시설/주변명소 등 3-4문장"}]}`;
+}
+
+function attrPrompt(hotel) {
+  return `당신은 여행 전문가입니다. 아래 호텔 주변의 놀거리/볼거리를 추천해주세요.
+호텔: ${hotel.name} (${hotel.location}) / 여행지: ${state.region} / 목적: ${state.purposes.join(",")} / 관계: ${state.relation}
+호텔에서 가기 좋은 주변 명소, 맛집, 카페, 액티비티 등 6개 추천.
+JSON만 출력:
+{"summary":"이 호텔에서 즐길 수 있는 한줄 소개(40자)","attractions":[{"name":"장소명","category":"맛집|카페|관광지|쇼핑|액티비티|자연|문화|야경 중 하나","location":"상세위치","distance":"예: 도보 5분","description":"2문장 설명","tip":"현지 꿀팁 한 문장"}]}`;
+}
+
+// ===== RENDER HELPERS =====
+function stars(r) {
+  let s = "";
+  for (let i=1;i<=5;i++) s += `<span style="color:${i<=Math.round(r)?'#A68558':'#DDD5C8'};font-size:12px;">★</span>`;
+  return s + `<span style="font-size:12px;color:#B8A898;margin-left:6px;">${r.toFixed(1)}</span>`;
+}
+
+function imgUrl(region, index) {
+  const kw = IMG_KEYWORDS[region] || "luxury hotel elegant interior";
+  const sigs = [142,117,188,155];
+  return `https://source.unsplash.com/400x240/?${encodeURIComponent(kw)}&sig=${sigs[index]||142}`;
+}
+
+function chipHTML(label, active, dataAttr) {
+  return `<button class="chip ${active?'active':''}" ${dataAttr}>${label}</button>`;
+}
+
+// ===== SHOW/HIDE =====
+function showLoading(msg) {
+  document.getElementById("loading-msg").textContent = msg || "잠시만 기다려 주세요…";
+  document.getElementById("loading").classList.remove("hidden");
+  ["step1","step2","step3","step4","step-indicator"].forEach(id => document.getElementById(id).classList.add("hidden"));
+}
+
+function hideLoading() {
+  document.getElementById("loading").classList.add("hidden");
+  document.getElementById("step-indicator").classList.remove("hidden");
+}
+
+function showError(msg) {
+  const el = document.getElementById("error-msg");
+  el.textContent = msg; el.classList.remove("hidden");
+}
+
+// ===== STEP INDICATOR =====
+function renderStepIndicator() {
+  const labels = ["여행자","여행지","목적","추천"];
+  const el = document.getElementById("step-indicator");
+  el.innerHTML = labels.map((label, i) => {
+    const s = i+1, active = state.step===s, done = state.step>s;
+    const circle = done
+      ? `<div style="width:28px;height:28px;border-radius:50%;background:#8B6F47;border:1px solid #8B6F47;display:flex;align-items:center;justify-content:center;font-size:11px;color:#fff;">✓</div>`
+      : `<div style="width:28px;height:28px;border-radius:50%;background:#fff;border:1px solid ${active?'#8B6F47':'#DDD5C8'};display:flex;align-items:center;justify-content:center;font-size:11px;color:${active?'#8B6F47':'#B8A898'};">${s}</div>`;
+    const line = i<3 ? `<div style="width:36px;height:1px;background:${state.step>s?'rgba(139,111,71,0.5)':'#DDD5C8'};margin:0 4px;margin-bottom:20px;"></div>` : "";
+    return `<div style="display:flex;align-items:center;">
+      <div style="display:flex;flex-direction:column;align-items:center;gap:5px;">
+        ${circle}
+        <span style="font-size:10px;color:${active?'#8B6F47':'#B8A898'};letter-spacing:0.06em;">${label}</span>
+      </div>${line}</div>`;
+  }).join("");
+}
+
+// ===== STEP 1 =====
+function renderStep1() {
+  const el = document.getElementById("step1");
+  el.classList.remove("hidden");
+  el.innerHTML = `
+    <div class="card">
+      <p class="serif" style="font-size:17px;color:#2C2416;margin-bottom:14px;">여행 인원</p>
+      <div style="display:flex;gap:3rem;">
+        <div style="display:flex;flex-direction:column;gap:8px;">
+          <span style="font-size:11px;color:#B8A898;letter-spacing:0.12em;text-transform:uppercase;">성인</span>
+          <div style="display:flex;align-items:center;gap:16px;">
+            <button class="stepper-btn" onclick="changeNum('adults',-1)">−</button>
+            <span class="serif" id="adults-val" style="font-size:22px;min-width:24px;text-align:center;color:#2C2416;">${state.adults}</span>
+            <button class="stepper-btn" onclick="changeNum('adults',1)">+</button>
+          </div>
+        </div>
+        <div style="display:flex;flex-direction:column;gap:8px;">
+          <span style="font-size:11px;color:#B8A898;letter-spacing:0.12em;text-transform:uppercase;">어린이</span>
+          <div style="display:flex;align-items:center;gap:16px;">
+            <button class="stepper-btn" onclick="changeNum('children',-1)">−</button>
+            <span class="serif" id="children-val" style="font-size:22px;min-width:24px;text-align:center;color:#2C2416;">${state.children}</span>
+            <button class="stepper-btn" onclick="changeNum('children',1)">+</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <p class="serif" style="font-size:17px;color:#2C2416;margin-bottom:14px;">여행 유형</p>
+      <div style="display:flex;flex-wrap:wrap;gap:10px;" id="relation-btns">
+        ${RELATIONS.map(r=>`<button class="rel-btn ${state.relation===r.label?'active':''}" onclick="selectRelation('${r.label}')">${r.icon} ${r.label}</button>`).join("")}
+      </div>
+    </div>
+
+    <div class="card">
+      <p class="serif" style="font-size:17px;color:#2C2416;margin-bottom:3px;">연령대</p>
+      <p style="font-size:11px;color:#B8A898;margin-bottom:14px;">복수 선택 가능</p>
+      <div style="display:flex;flex-wrap:wrap;gap:8px;" id="age-chips">
+        ${AGE_GROUPS.map(a=>chipHTML(a, state.ageGroups.includes(a), `onclick="toggleAge('${a}')"`)).join("")}
+      </div>
+    </div>
+
+    <button class="pbtn" id="step1-next" onclick="goStep(2)" ${!state.relation||!state.ageGroups.length?'disabled':''}>다음 단계 →</button>
+  `;
+}
+
+// ===== STEP 2 =====
+function renderStep2() {
+  const el = document.getElementById("step2");
+  el.classList.remove("hidden");
+  el.innerHTML = `
+    <div class="card">
+      <p class="serif" style="font-size:17px;color:#2C2416;margin-bottom:14px;">여행지 선택</p>
+      <div style="display:flex;flex-wrap:wrap;gap:8px;" id="region-chips">
+        ${REGIONS.map(r=>chipHTML(r, state.region===r, `onclick="selectRegion('${r}')"`)).join("")}
+      </div>
+    </div>
+
+    <div class="card">
+      <p class="serif" style="font-size:17px;color:#2C2416;margin-bottom:14px;">숙박 기간</p>
+      <div style="display:flex;align-items:center;gap:20px;">
+        <div style="display:flex;flex-direction:column;gap:8px;">
+          <span style="font-size:11px;color:#B8A898;letter-spacing:0.12em;text-transform:uppercase;">박</span>
+          <div style="display:flex;align-items:center;gap:16px;">
+            <button class="stepper-btn" onclick="changeNum('nights',-1,1,30)">−</button>
+            <span class="serif" id="nights-val" style="font-size:22px;min-width:24px;text-align:center;color:#2C2416;">${state.nights}</span>
+            <button class="stepper-btn" onclick="changeNum('nights',1,1,30)">+</button>
+          </div>
+        </div>
+        <span class="serif" id="nights-label" style="font-size:15px;font-style:italic;color:#B8A898;margin-top:22px;">${state.nights}박 ${state.nights+1}일</span>
+      </div>
+    </div>
+
+    <div class="card">
+      <p class="serif" style="font-size:17px;color:#2C2416;margin-bottom:14px;">예산 등급</p>
+      <div style="display:flex;flex-direction:column;gap:8px;">
+        ${BUDGETS.map(b=>`
+          <button class="brow ${state.budgetLabel===b.label?'active':''}" onclick="selectBudget('${b.label}','${b.sub}')">
+            <span style="font-size:18px;">${b.icon}</span>
+            <div>
+              <p class="serif" style="font-size:15px;color:${state.budgetLabel===b.label?'#6B5233':'#2C2416'};margin:0;">${b.label}</p>
+              <p style="font-size:11px;color:#B8A898;margin:0;">${b.sub}</p>
+            </div>
+          </button>`).join("")}
+      </div>
+    </div>
+
+    <div style="display:flex;gap:10px;">
+      <button class="gbtn" onclick="goStep(1)">← 이전</button>
+      <button class="pbtn" style="flex:2;" id="step2-next" onclick="goStep(3)" ${!state.region||!state.budget?'disabled':''}>다음 단계 →</button>
+    </div>
+  `;
+}
+
+// ===== STEP 3 =====
+function renderStep3() {
+  const el = document.getElementById("step3");
+  el.classList.remove("hidden");
+  el.innerHTML = `
+    <div class="card">
+      <p class="serif" style="font-size:17px;color:#2C2416;margin-bottom:3px;">여행 목적</p>
+      <p style="font-size:11px;color:#B8A898;margin-bottom:14px;">복수 선택 가능</p>
+      <div style="display:flex;flex-wrap:wrap;gap:8px;" id="purpose-chips">
+        ${PURPOSES.map(p=>chipHTML(p, state.purposes.includes(p), `onclick="togglePurpose('${p}')"`)).join("")}
+      </div>
+    </div>
+
+    <div class="card">
+      <p class="serif" style="font-size:17px;color:#2C2416;margin-bottom:3px;">추가 요청사항</p>
+      <p style="font-size:11px;color:#B8A898;margin-bottom:14px;">선택 · 예: 수영장 필수, 반려동물 동반, 조식 포함</p>
+      <textarea id="extra-input" rows="3" placeholder="원하시는 조건을 자유롭게 입력해주세요"
+        style="width:100%;padding:10px 14px;border-radius:8px;font-size:13px;border:1px solid #DDD5C8;background:#F3EDE3;color:#2C2416;resize:vertical;line-height:1.7;"
+        oninput="state.extra=this.value">${state.extra}</textarea>
+    </div>
+
+    <div style="padding:16px 20px;background:#fff;border-radius:12px;border:1px solid #DDD5C8;margin-bottom:14px;">
+      <p style="font-size:10px;color:#A68558;letter-spacing:0.15em;text-transform:uppercase;margin-bottom:8px;">입력 요약</p>
+      <p class="serif" style="font-size:14px;color:#8A7560;line-height:2;font-style:italic;margin:0;">
+        ${state.relation} · 성인 ${state.adults}명${state.children>0?` + 어린이 ${state.children}명`:""}<br>
+        ${state.region} · ${state.nights}박 · ${state.budgetLabel}<br>
+        ${state.ageGroups.join(", ")}<br>
+        ${state.purposes.join(" · ")||"—"}
+      </p>
+    </div>
+
+    <div style="display:flex;gap:10px;">
+      <button class="gbtn" onclick="goStep(2)">← 이전</button>
+      <button class="pbtn" style="flex:2;" id="step3-next" onclick="submitHotels()" ${!state.purposes.length?'disabled':''}>✦ 호텔 추천받기</button>
+    </div>
+  `;
+}
+
+// ===== STEP 4 =====
+function renderStep4() {
+  hideLoading();
+  const el = document.getElementById("step4");
+  el.classList.remove("hidden");
+  el.innerHTML = `
+    <div style="margin-bottom:1.5rem;padding:18px 22px;background:#fff;border-radius:16px;border:1px solid #DDD5C8;box-shadow:0 2px 16px rgba(0,0,0,0.05);text-align:center;animation:fadeUp .4s ease;">
+      <p style="font-size:10px;color:#A68558;letter-spacing:0.2em;text-transform:uppercase;margin-bottom:8px;">AI 추천</p>
+      <p class="serif" style="font-size:18px;font-style:italic;color:#2C2416;line-height:1.7;margin:0;">${state.summary}</p>
+    </div>
+
+    <p style="font-size:11px;color:#B8A898;letter-spacing:0.12em;text-transform:uppercase;margin-bottom:12px;">호텔을 선택하면 주변 놀거리를 추천해드려요</p>
+
+    <div class="hotel-grid" style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:1.5rem;">
+      ${state.results.map((h,i)=>hotelSelectCardHTML(h,i)).join("")}
+    </div>
+
+    <div id="selected-hotel-detail"></div>
+    <div id="attr-loading" class="hidden" style="text-align:center;padding:2rem 0;">
+      <div class="serif" style="font-size:28px;color:#A68558;display:inline-block;animation:spin 8s linear infinite;">✦</div>
+      <p class="serif" style="font-size:16px;font-style:italic;color:#8A7560;margin:10px 0 4px;">주변 놀거리를 찾고 있습니다…</p>
+      <div style="display:flex;justify-content:center;gap:8px;margin-top:12px;">
+        <div style="width:5px;height:5px;border-radius:50%;background:#A68558;animation:bounce 1.2s ease-in-out 0s infinite;"></div>
+        <div style="width:5px;height:5px;border-radius:50%;background:#A68558;animation:bounce 1.2s ease-in-out 0.2s infinite;"></div>
+        <div style="width:5px;height:5px;border-radius:50%;background:#A68558;animation:bounce 1.2s ease-in-out 0.4s infinite;"></div>
+      </div>
+    </div>
+    <div id="attractions-container"></div>
+
+    <div style="margin-top:1.75rem;text-align:center;">
+      <button onclick="resetAll()" style="padding:12px 28px;border-radius:100px;border:1px solid #DDD5C8;background:transparent;color:#8A7560;font-size:13px;letter-spacing:0.06em;transition:all .18s;">
+        ↺ 새로운 여행 검색
+      </button>
+    </div>
+  `;
+}
+
+function hotelSelectCardHTML(h, i) {
+  const sel = state.selectedHotel?.name === h.name;
+  const isTop = i===0;
+  const url = imgUrl(state.region, i);
+  return `
+    <div class="hsel ${sel?'selected':''}" onclick="selectHotel(${i})">
+      <div style="height:110px;overflow:hidden;background:#F3EDE3;position:relative;flex-shrink:0;">
+        <img src="${url}" alt="${h.name}" onerror="this.style.display='none'"
+          style="width:100%;height:100%;object-fit:cover;display:block;animation:imgFade .6s ease;">
+        <div style="position:absolute;inset:0;background:linear-gradient(to bottom,transparent 30%,rgba(0,0,0,0.28) 100%);"></div>
+        ${isTop?`<span style="position:absolute;top:8px;left:8px;background:#8B6F47;color:#fff;font-size:9px;padding:3px 9px;border-radius:100px;letter-spacing:0.1em;text-transform:uppercase;font-weight:500;">Best Pick</span>`:''}
+        ${sel?`<div style="position:absolute;top:8px;right:8px;background:#8B6F47;color:#fff;border-radius:50%;width:22px;height:22px;display:flex;align-items:center;justify-content:center;font-size:12px;">✓</div>`:''}
+        <div style="position:absolute;bottom:8px;right:10px;">
+          <span class="serif" style="font-size:13px;color:#fff;text-shadow:0 1px 4px rgba(0,0,0,0.5);">${h.price}</span>
+        </div>
+      </div>
+      <div style="padding:12px 14px 14px;flex:1;display:flex;flex-direction:column;gap:4px;">
+        <p class="serif" style="margin:0;font-size:15px;color:#2C2416;line-height:1.45;word-break:keep-all;">${h.name}</p>
+        <p style="margin:0;font-size:11px;color:#B8A898;line-height:1.4;">📍 ${h.location}</p>
+        <div style="margin-top:auto;padding-top:6px;">${stars(h.rating)}</div>
+      </div>
+      ${sel?`<div style="height:3px;background:linear-gradient(90deg,#8B6F47,#A68558);flex-shrink:0;"></div>`:''}
+    </div>`;
+}
+
+function hotelDetailHTML(h, i) {
+  const url = imgUrl(state.region, i);
+  const isTop = i===0;
+  return `
+    <div style="margin-bottom:1.5rem;animation:fadeUp .4s ease;">
+      <p style="font-size:11px;color:#A68558;letter-spacing:0.12em;text-transform:uppercase;margin-bottom:12px;">선택한 호텔</p>
+      <div style="background:#fff;border-radius:16px;border:1px solid ${isTop?'rgba(139,111,71,0.33)':'#DDD5C8'};overflow:hidden;box-shadow:${isTop?`0 4px 24px rgba(139,111,71,0.1)`:'0 2px 12px rgba(0,0,0,0.04)'};">
+        <div style="position:relative;height:180px;overflow:hidden;background:#F3EDE3;">
+          <img src="${imgUrl(state.region,i)}" alt="${h.name}" onerror="this.style.display='none'"
+            style="width:100%;height:100%;object-fit:cover;display:block;animation:imgFade .6s ease;">
+          <div style="position:absolute;inset:0;background:linear-gradient(to bottom,transparent 50%,rgba(0,0,0,0.35) 100%);"></div>
+          ${isTop?`<span style="position:absolute;top:12px;left:12px;background:rgba(139,111,71,0.93);color:#fff;font-size:10px;padding:3px 10px;border-radius:100px;letter-spacing:0.12em;text-transform:uppercase;">Recommandé</span>`:''}
+          <div style="position:absolute;bottom:12px;right:14px;text-align:right;">
+            <p class="serif" style="margin:0;font-size:17px;color:#fff;text-shadow:0 1px 4px rgba(0,0,0,0.4);">${h.price}</p>
+            <p style="margin:0;font-size:10px;color:rgba(255,255,255,0.8);">/ 1박</p>
+          </div>
+        </div>
+        <div style="padding:1.2rem 1.4rem 1rem;">
+          <p class="serif" style="margin:0 0 3px;font-size:20px;color:#2C2416;">${h.name}</p>
+          <p style="margin:0 0 7px;font-size:12px;color:#B8A898;">📍 ${h.location}</p>
+          ${stars(h.rating)}
+          <div style="display:flex;flex-wrap:wrap;gap:6px;margin-top:12px;">
+            ${h.tags.map(t=>`<span style="background:#F3EDE3;border-radius:100px;padding:4px 12px;font-size:11px;color:#8A7560;border:1px solid #E8DDD0;">${t}</span>`).join("")}
+          </div>
+        </div>
+        <div style="margin:0 1.4rem;height:1px;background:linear-gradient(90deg,transparent,#DDD5C8,transparent);"></div>
+        <div style="padding:1rem 1.4rem;">
+          <p style="font-size:10px;color:#A68558;letter-spacing:0.15em;text-transform:uppercase;margin-bottom:5px;">추천 이유</p>
+          <p style="font-size:13px;color:#8A7560;line-height:1.8;margin:0;">${h.reason}</p>
+        </div>
+        ${h.details?`
+        <button class="detail-btn" onclick="toggleDetail(this)">
+          <span>상세 정보</span><span style="transition:transform .2s;display:inline-block;">▾</span>
+        </button>
+        <div class="hidden" style="padding:1rem 1.4rem;font-size:13px;color:#8A7560;line-height:1.8;background:#F3EDE3;">${h.details}</div>`:''}
+      </div>
+    </div>`;
+}
+
+function attractionHTML(a, i) {
+  const catColors = {"맛집":"#E8F5E9","카페":"#FFF3E0","관광지":"#E3F2FD","쇼핑":"#FCE4EC","액티비티":"#F3E5F5","자연":"#E0F2F1","문화":"#FFF8E1","야경":"#E8EAF6"};
+  const catEmoji = {"맛집":"🍽️","카페":"☕","관광지":"🏛️","쇼핑":"🛍️","액티비티":"🎯","자연":"🌿","문화":"🎭","야경":"🌃"};
+  const cat = a.category||"관광지";
+  return `
+    <div class="fade-up" style="background:#fff;border:1px solid #DDD5C8;border-radius:14px;padding:1rem 1.2rem;display:flex;gap:14px;align-items:flex-start;box-shadow:0 2px 10px rgba(0,0,0,0.04);margin-bottom:10px;">
+      <div style="width:44px;height:44px;border-radius:12px;background:${catColors[cat]||'#F5F5F5'};display:flex;align-items:center;justify-content:center;font-size:22px;flex-shrink:0;">${catEmoji[cat]||"📍"}</div>
+      <div style="flex:1;min-width:0;">
+        <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:8px;margin-bottom:3px;">
+          <p class="serif" style="margin:0;font-size:16px;color:#2C2416;">${a.name}</p>
+          <span style="font-size:10px;background:${catColors[cat]||'#F5F5F5'};color:#8A7560;padding:2px 8px;border-radius:100px;white-space:nowrap;border:1px solid #DDD5C8;flex-shrink:0;">${cat}</span>
+        </div>
+        <p style="font-size:11px;color:#B8A898;margin:0 0 5px;">📍 ${a.location}${a.distance?` · ${a.distance}`:""}</p>
+        <p style="font-size:12px;color:#8A7560;line-height:1.7;margin:0;">${a.description}</p>
+        ${a.tip?`<p style="font-size:11px;color:#A68558;line-height:1.6;margin:6px 0 0;">💡 ${a.tip}</p>`:""}
+      </div>
+    </div>`;
+}
+
+// ===== INTERACTIONS =====
+function changeNum(field, delta, min=0, max=20) {
+  if (field==='adults') min=1;
+  state[field] = Math.min(max, Math.max(min, state[field]+delta));
+  const el = document.getElementById(`${field}-val`);
+  if (el) el.textContent = state[field];
+  if (field==='nights') {
+    document.getElementById("nights-label").textContent = `${state.nights}박 ${state.nights+1}일`;
+  }
+}
+
+function selectRelation(val) {
+  state.relation = val;
+  document.querySelectorAll("#relation-btns .rel-btn").forEach(b => {
+    b.classList.toggle("active", b.textContent.includes(val));
+  });
+  checkStep1();
+}
+
+function toggleAge(val) {
+  const idx = state.ageGroups.indexOf(val);
+  if (idx>-1) state.ageGroups.splice(idx,1); else state.ageGroups.push(val);
+  document.querySelectorAll("#age-chips .chip").forEach(b => {
+    b.classList.toggle("active", state.ageGroups.includes(b.textContent));
+  });
+  checkStep1();
+}
+
+function selectRegion(val) {
+  state.region = val;
+  document.querySelectorAll("#region-chips .chip").forEach(b => {
+    b.classList.toggle("active", b.textContent===val);
+  });
+  checkStep2();
+}
+
+function selectBudget(label, sub) {
+  state.budget = sub; state.budgetLabel = label;
+  document.querySelectorAll(".brow").forEach(b => {
+    b.classList.toggle("active", b.querySelector(".serif").textContent===label);
+    b.querySelector(".serif").style.color = b.classList.contains("active") ? "#6B5233" : "#2C2416";
+  });
+  checkStep2();
+}
+
+function togglePurpose(val) {
+  const idx = state.purposes.indexOf(val);
+  if (idx>-1) state.purposes.splice(idx,1); else state.purposes.push(val);
+  document.querySelectorAll("#purpose-chips .chip").forEach(b => {
+    b.classList.toggle("active", state.purposes.includes(b.textContent));
+  });
+  document.getElementById("step3-next").disabled = !state.purposes.length;
+}
+
+function checkStep1() {
+  const btn = document.getElementById("step1-next");
+  if (btn) btn.disabled = !state.relation || !state.ageGroups.length;
+}
+function checkStep2() {
+  const btn = document.getElementById("step2-next");
+  if (btn) btn.disabled = !state.region || !state.budget;
+}
+
+function toggleDetail(btn) {
+  const detail = btn.nextElementSibling;
+  const arrow = btn.querySelector("span:last-child");
+  detail.classList.toggle("hidden");
+  arrow.style.transform = detail.classList.contains("hidden") ? "rotate(0deg)" : "rotate(180deg)";
+}
+
+function goStep(s) {
+  ["step1","step2","step3","step4"].forEach(id => document.getElementById(id).classList.add("hidden"));
+  state.step = s;
+  renderStepIndicator();
+  if (s===1) renderStep1();
+  else if (s===2) renderStep2();
+  else if (s===3) renderStep3();
+}
+
+async function submitHotels() {
+  document.getElementById("error-msg").classList.add("hidden");
+  try {
+    const parsed = await callClaude(hotelPrompt(), "최적의 호텔을 찾고 있습니다…");
+    state.summary = parsed.summary;
+    state.results = parsed.hotels;
+    state.step = 4;
+    renderStepIndicator();
+    renderStep4();
+  } catch(e) {
+    hideLoading();
+    document.getElementById("step3").classList.remove("hidden");
+    showError("호텔 추천을 불러오는 중 문제가 발생했습니다. 다시 시도해주세요.");
+  }
+}
+
+async function selectHotel(i) {
+  state.selectedHotel = state.results[i];
+  // 그리드 리렌더
+  document.querySelector(".hotel-grid").innerHTML = state.results.map((h,idx)=>hotelSelectCardHTML(h,idx)).join("");
+  document.getElementById("selected-hotel-detail").innerHTML = hotelDetailHTML(state.selectedHotel, i);
+  document.getElementById("attractions-container").innerHTML = "";
+  document.getElementById("attr-loading").classList.remove("hidden");
+  try {
+    const parsed = await callClaude(attrPrompt(state.selectedHotel), "주변 놀거리를 찾고 있습니다…");
+    state.attrSummary = parsed.summary;
+    state.attractions = parsed.attractions;
+    document.getElementById("attr-loading").classList.add("hidden");
+    const ac = document.getElementById("attractions-container");
+    ac.innerHTML = `
+      <div style="display:flex;align-items:center;gap:10px;margin:0 0 12px;">
+        <div style="flex:1;height:1px;background:linear-gradient(90deg,transparent,#DDD5C8);"></div>
+        <p style="font-size:11px;color:#A68558;letter-spacing:0.15em;text-transform:uppercase;margin:0;white-space:nowrap;">📍 주변 추천 명소</p>
+        <div style="flex:1;height:1px;background:linear-gradient(90deg,#DDD5C8,transparent);"></div>
+      </div>
+      <p class="serif" style="font-size:15px;font-style:italic;color:#8A7560;text-align:center;margin-bottom:16px;line-height:1.7;">${parsed.summary}</p>
+      ${parsed.attractions.map((a,i)=>attractionHTML(a,i)).join("")}`;
+  } catch(e) {
+    document.getElementById("attr-loading").classList.add("hidden");
+  }
+}
+
+function resetAll() {
+  state = { step:1, adults:2, children:0, ageGroups:[], relation:"", region:"", nights:2, budget:"", budgetLabel:"", purposes:[], extra:"", results:null, summary:"", selectedHotel:null, attractions:null, attrSummary:"" };
+  ["step2","step3","step4","loading"].forEach(id=>document.getElementById(id).classList.add("hidden"));
+  document.getElementById("error-msg").classList.add("hidden");
+  document.getElementById("step-indicator").classList.remove("hidden");
+  renderStepIndicator();
+  renderStep1();
+  document.getElementById("step1").classList.remove("hidden");
+}
+
+// ===== INIT =====
+renderStepIndicator();
+renderStep1();
+</script>
+</body>
+</html>
